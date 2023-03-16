@@ -1,0 +1,27 @@
+{% extends 'bootstrap/base.html' %}
+
+{%- block title %}
+    {{ title }}
+{%- endblock title %}
+
+{% block styles %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css">
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+    <div class="d-flex flex-column align-items-center justify-content-around">
+        <!-- <div id='map'> -->
+        <img class='h-75 w-50 p-3' id='map' src="{{ map_src }}" alt="">
+        <div class="flex-row justify-content-between">
+            <a href="{{ url_for('home') }}" id="homeButton" class="btn btn-warning">Спочатку</a>
+
+            <a id="addEdgeButton" class="btn btn-danger">Додати ребро</a>
+            <a href="{{ url_for('build_way') }}" id="buildWayButton" class="btn btn-primary">Побудувати шлях</a>
+            <a id="addNodeButton" class="btn btn-success">Додати вершину</a>
+        </div>
+    </div>
+{% endblock %}
