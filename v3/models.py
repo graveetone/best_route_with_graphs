@@ -1,5 +1,6 @@
 from app import db
 
+
 class Node(db.Model):
     __tablename__ = 'nodes'
     id = db.Column(db.Integer, primary_key=True)
@@ -15,6 +16,12 @@ class Node(db.Model):
     
     def __repr__(self):
         return f"<Node {self.title} ({self.x};{self.y})>"
+    
+    def edges(self):
+        return [
+            *self.in_edges,
+            *self.out_edges
+        ]
 
 class Edge(db.Model):
     __tablename__ = 'edges'
@@ -27,5 +34,3 @@ class Edge(db.Model):
 
     def __repr__(self):
         return f"<Edge {self.start_node.title}-{self.end_node.title} with weight {self.weight}>"
-
-
