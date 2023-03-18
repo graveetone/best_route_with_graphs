@@ -1,0 +1,83 @@
+# TODO clean up this js code and ove it to separate filename
+
+{% extends 'home.html' %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        const img = $("#pointer");
+        const movableImg = $("#movablePointer");
+
+        img.hide()
+        movableImg.hide()
+        img.attr("src", "{{ url_for('static', filename='pointer.png') }}");
+        movableImg.attr("src", "{{ url_for('static', filename='pointer.png') }}");
+
+        let map = document.querySelector('#map');
+
+        var img_ = new Image();
+        img_.onload = function() {
+            var width = this.naturalWidth;
+            var height = this.naturalHeight;
+        };
+
+        img_.src = $('#map').attr('src');
+
+        $('#map').on('mousemove', function (event) {
+            let w = movableImg.width();
+            let h = movableImg.height()
+
+            movableImg.show()
+
+            movableImg.css('position', 'absolute');
+
+            movableImg.css("left", event.clientX - w / 2 + "px");
+            movableImg.css("top", event.clientY - h + "px");
+        })
+
+        $('#map').on('mouseout', function (event) {
+            movableImg.hide()
+
+        })
+
+        $('#map').on('click', function (event) {
+            $('#map').on('mousemove', function() {})
+
+            let x = event.pageX - $(this).offset().left;
+            let y = event.pageY - $(this).offset().top;
+
+            let w = img.width();
+            let h = img.height();
+
+            img.css("display", "block");
+            img.show()
+
+            img.css('position', 'absolute');
+
+            img.css("left", event.clientX - w / 2 + "px");
+            img.css("top", event.clientY - h + "px");
+
+
+            $('[name="x"]').val(event.offsetX / 1.2);
+            $('[name="y"]').val(event.offsetY / 1.2);
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+<img id="pointer">
+<img id="movablePointer">
+
+<div class="d-flex flex-column align-items-center justify-content-around">
+    <img class='w-50 h-75' id='map' src="{{ map_src }}" alt="">
+
+    <form method='POST' class='d-flex flex-column justify-content-between'>
+        <input name='title' type="text" placeholder="Назва міста" class="m-2">
+        <input name='x' type="text" placeholder='Координата x' class="m-2" readonly hidden>
+        <input name='y' type="text" placeholder="Координата у" class="m-2" readonly hidden>
+        <input type="submit" value="Додати вершину" class="btn btn-dark m-2">
+    </form>
+    <a class="btn btn-lightborder border-dark " href="{{ url_for('home')}}">Назад</a>
+
+</div>
+{% endblock %}

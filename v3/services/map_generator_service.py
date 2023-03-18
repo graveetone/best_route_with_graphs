@@ -58,6 +58,8 @@ class MapGeneratorService:
     def compose_graph(self):
         titles = [node.title for node in self.nodes]
         positions = {node.title : [node.x, node.y] for node in self.nodes}
+        node_label_positions = {node.title : [node.x, node.y - 15] for node in self.nodes}
+        
 
         self.compose_node_colors()
         self.compose_edge_colors()
@@ -71,6 +73,8 @@ class MapGeneratorService:
 
         edge_labels = nx.get_edge_attributes(self.graph, 'weight')
 
+        node_labels = {node.title: (node.title if node.is_custom else '') for node in self.nodes}
+        nx.draw_networkx_labels(self.graph, labels=node_labels, pos=node_label_positions, font_size=6)
         # nx.draw_networkx_edge_labels(self.graph, pos=positions, edge_labels=edge_labels, font_size=6, font_color='white', bbox=dict(boxstyle='round',facecolor='black', edgecolor='none'), label_pos=0.5)
 
     def save_image(self):

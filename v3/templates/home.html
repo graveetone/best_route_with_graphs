@@ -38,7 +38,7 @@
 
 {% block content %}
     <div class="d-flex flex-column align-items-center justify-content-around">
-        <img class='h-75 w-50 p-3' id='map' src="{{ map_src }}" alt="">
+        <img class='w-50 h-75' id='map' src="{{ map_src }}" alt="">
         
         <div class="d-flex flex-row justify-content-between m-4">
             <div class="d-flex flex-column align-items-center m-4">
@@ -63,11 +63,9 @@
 
         <div class="d-flex justify-content-between">
             <a href="{{ url_for('home') }}" id="homeButton" class="btn btn-warning mx-2">Спочатку</a>
-            <a id="addEdgeButton" class="btn btn-danger mx-2">Додати ребро</a>
+            <a href="{{ url_for('add_edge') }}" id="addEdgeButton" class="btn btn-danger mx-2">Додати ребро</a>
             <button onclick="buildWay()" id="buildWayButton" class="btn btn-primary">Побудувати шлях</button>
-            <a id="addNodeButton" class="btn btn-success mx-2">Додати вершину</a>
+            <a href="{{ url_for('add_node') }}" id="addNodeButton" class="btn btn-success mx-2">Додати вершину</a>
         </div>
-        
-        
     </div>
 {% endblock %}

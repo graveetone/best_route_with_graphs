@@ -1,0 +1,33 @@
+{% extends 'home.html' %}
+
+{% block content %}
+    <div class="d-flex flex-column align-items-center justify-content-around">
+        <img class='w-50 h-75' id='map' src="{{ map_src }}" alt="">
+
+        <form method='POST' class='d-flex flex-column justify-content-between'>
+            <div class="d-flex flex-row justify-content-between m-4">
+                <div class="d-flex flex-column align-items-center m-4">
+                    <label for="start">Початкова точка:</label>
+                    <select id='start' class="form-select" aria-label="Початкова точка" name="start">
+                        {% for node in nodes %}
+                            <option value={{ node.id }}>{{ node.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="flex-column align-items-center m-4">
+                    <label for="end">Кінцева точка:</label>
+                    <select id='end' class="form-select" aria-label="Початкова точка" name="end">
+                        {% for node in nodes %}
+                            <option value={{ node.id }}>{{ node.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <input name='weight' type="number" placeholder="Вага ребра" class="m-2" step="0.1">
+            <input type="submit" value="Додати ребро" class="btn btn-dark m-2">
+        </form>
+        <a class="btn btn-lightborder border-dark " href="{{ url_for('home')}}">Назад</a>
+
+    </div>
+{% endblock %}
