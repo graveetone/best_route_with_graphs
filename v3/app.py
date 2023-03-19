@@ -51,9 +51,6 @@ def build_way():
 
     nodes_to_highlight, edges_to_highlight = wbs.build_way(start, end)
 
-    print('NTH: ', nodes_to_highlight)
-    print('ETH: ', edges_to_highlight)
-
     mgs_instance = MapGeneratorService(edges=edges, nodes=nodes)
     frame_filepath = mgs_instance.call(edges_to_highlight=edges_to_highlight, nodes_to_highlight=nodes_to_highlight)
 

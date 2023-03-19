@@ -9,12 +9,14 @@ import networkx as nx
 import os
 import uuid
 
+from services.ua_sorting_service import UASortingService
+
 matplotlib.use('Agg')
 
 class MapGeneratorService:
     def __init__(self, nodes, edges):
         self.nodes = nodes
-        self.edges = edges
+        self.edges = UASortingService(edges).call(comparator=lambda edge: edge.start_node.title)
 
         self.basic_map_image = mpimg.imread('static/map.png')
 
@@ -71,11 +73,9 @@ class MapGeneratorService:
         nx.draw_networkx_nodes(self.graph, positions, node_color=self.node_colors, node_size=50, edgecolors='black')
         nx.draw_networkx_edges(self.graph, positions, width=self.edge_widths, edge_color=self.edge_colors, arrows=False)
 
-        edge_labels = nx.get_edge_attributes(self.graph, 'weight')
 
         node_labels = {node.title: (node.title if node.is_custom else '') for node in self.nodes}
         nx.draw_networkx_labels(self.graph, labels=node_labels, pos=node_label_positions, font_size=6)
-        # nx.draw_networkx_edge_labels(self.graph, pos=positions, edge_labels=edge_labels, font_size=6, font_color='white', bbox=dict(boxstyle='round',facecolor='black', edgecolor='none'), label_pos=0.5)
 
     def save_image(self):
         plt.imshow(self.basic_map_image)
