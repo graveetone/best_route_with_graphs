@@ -1,6 +1,6 @@
 import time
 
-class Timer:
+class TimerService:
     def __init__(self):
         self._start_time = time.time()
         self.stopped = False
@@ -11,4 +11,4 @@ class Timer:
 
     def __repr__(self):
         self._stop()
-        return f"{self.timedelta} секунд"       
+        return f"{self.timedelta} с"

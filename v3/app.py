@@ -3,6 +3,7 @@ from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 
 from services.reset_folder_service import ResetFolderService
+from services.timer_service import TimerService
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
@@ -18,17 +19,18 @@ from models import Node, Edge
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'GET':
-        Node.query.filter_by(is_custom=True).delete()
-        Edge.query.filter_by(is_custom=True).delete()
+        if request.args.get('reset'):
+            Node.query.filter_by(is_custom=True).delete()
+            Edge.query.filter_by(is_custom=True).delete()
         
-        db.session.commit()
+            db.session.commit()
 
+
+            ResetFolderService('static/frames').call()
         nodes = Node.query.all()
+        edges = Edge.query.all()
 
-        ResetFolderService('static/frames').call()
-        map_src = MapGeneratorService(nodes, []).call([], [])
-
-
+        map_src = MapGeneratorService(nodes, edges).call([], [])
 
         return render_template('home.html', title='FindWayLab', map_src=url_for('static', filename=map_src), nodes=nodes)
     
@@ -44,13 +46,26 @@ def build_way():
     edges = Edge.query.all()
 
     wbs = WayBuilderService(nodes)
+
+    timer = TimerService()
+
     nodes_to_highlight, edges_to_highlight = wbs.build_way(start, end)
+
+    print('NTH: ', nodes_to_highlight)
+    print('ETH: ', edges_to_highlight)
 
     mgs_instance = MapGeneratorService(edges=edges, nodes=nodes)
     frame_filepath = mgs_instance.call(edges_to_highlight=edges_to_highlight, nodes_to_highlight=nodes_to_highlight)
 
+    info = {
+        'distance': f'{sum(edge.weight for edge in edges_to_highlight)} км',
+        'path': ' -> '.join([n.title for n in nodes_to_highlight]),
+        'time': str(timer)
+    }
+
     return {
-        'map': url_for('static', filename=frame_filepath)
+        'map': url_for('static', filename=frame_filepath),
+        **info
     }
 
 @app.route('/add_node', methods=['GET', 'POST'])
@@ -97,7 +112,8 @@ def add_edge():
         else:
             edge = Edge(start_node=start,
                         end_node=end,
-                        weight=weight)
+                        weight=weight,
+                        is_custom=True)
 
             db.session.add(edge)
             db.session.commit()

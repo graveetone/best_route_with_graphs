@@ -1,5 +1,3 @@
-# from models import Node
-
 class WayBuilderService:
     def __init__(self, nodes):
         self.nodes = nodes
@@ -14,6 +12,7 @@ class WayBuilderService:
         edges = []
         for i in range(len(nodes)-1):
             edge = Edge.query.filter_by(start_node=nodes[i], end_node=nodes[i+1]).first()
+            edge = Edge.query.filter_by(start_node=nodes[i+1], end_node=nodes[i]).first() if not edge else edge
             edges.append(edge)
         return nodes, edges
 
@@ -26,6 +25,7 @@ class WayBuilderService:
         
         for edge in start.edges(): #start.neighbours:
             node = edge.end_node
+            node = edge.start_node if node == start else node
             if node not in self.visited:
                 result = self.find_path(node, end)
                 if result:
