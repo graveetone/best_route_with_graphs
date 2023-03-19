@@ -45,17 +45,20 @@ def build_way():
     nodes = Node.query.all()
     edges = Edge.query.all()
 
-    wbs = WayBuilderService(nodes)
+    wbs = WayBuilderService()
 
     timer = TimerService()
 
-    nodes_to_highlight, edges_to_highlight = wbs.build_way(start, end)
+    result = wbs.build_way(start, end)
+    path = result[0] if result else ()
+
+    nodes_to_highlight, edges_to_highlight, distance = path if path else ([], [], 0)
 
     mgs_instance = MapGeneratorService(edges=edges, nodes=nodes)
     frame_filepath = mgs_instance.call(edges_to_highlight=edges_to_highlight, nodes_to_highlight=nodes_to_highlight)
 
     info = {
-        'distance': f'{sum(edge.weight for edge in edges_to_highlight)} км',
+        'distance': f'{distance} км',
         'path': ' -> '.join([n.title for n in nodes_to_highlight]),
         'time': str(timer)
     }
@@ -84,7 +87,8 @@ def add_node():
             db.session.commit()
 
         nodes = Node.query.all()
-        map_src = MapGeneratorService(nodes, []).call([], [])
+        edges = Edge.query.all()
+        map_src = MapGeneratorService(nodes, edges).call([], [])
 
         return render_template('home.html', title='FindWayLab', map_src=url_for('static', filename=map_src), nodes=nodes)
 
@@ -116,7 +120,8 @@ def add_edge():
             db.session.commit()
 
         nodes = Node.query.all()
-        map_src = MapGeneratorService(nodes, [edge]).call([edge.start_node, edge.end_node], [edge])
+        edges = Edge.query.all()
+        map_src = MapGeneratorService(nodes, edges).call([edge.start_node, edge.end_node], [edge])
 
 
         return render_template('home.html', title='FindWayLab', map_src=url_for('static', filename=map_src), nodes=nodes)

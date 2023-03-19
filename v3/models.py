@@ -43,6 +43,9 @@ class Node(db.Model):
             edges.append(edge)
         
         return edges
+    
+    def distance_to(self, other):
+        return min([edge.weight if edge else None for edge in Node.compose_edges([self, other])])
 
 
 class Edge(db.Model):
@@ -51,8 +54,8 @@ class Edge(db.Model):
     start_node_id = db.Column(db.Integer, db.ForeignKey('nodes.id'))
     end_node_id = db.Column(db.Integer, db.ForeignKey('nodes.id'))
     weight = db.Column(db.Float)
-    start_node = db.relationship('Node', back_populates='out_edges', foreign_keys=[start_node_id])
-    end_node = db.relationship('Node', back_populates='in_edges', foreign_keys=[end_node_id])
+    start_node = db.relationship('Node', back_populates='out_edges', foreign_keys=[start_node_id], lazy='joined')
+    end_node = db.relationship('Node', back_populates='in_edges', foreign_keys=[end_node_id], lazy='joined')
     is_custom = db.Column(db.Boolean, default=False)
 
 

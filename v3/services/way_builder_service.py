@@ -1,34 +1,33 @@
+from models import Node
 class WayBuilderService:
-    def __init__(self, nodes):
-        self.nodes = nodes
-        self.visited = set()
-        self.path = []
+    def __init__(self):
+        self.nodes = Node.query.all()
 
     def build_way(self, start, end):
-        Node = type(self.nodes[0])
-        Edge = type(self.nodes[0].edges()[0])
+        paths = self.find_paths(start, end) # each path: list of nodes and distance
+        paths = sorted(paths, key=lambda path: path[1]) # sort by distance
 
-        nodes =  self.find_path(start, end)
-        edges = []
-        for i in range(len(nodes)-1):
-            edge = Edge.query.filter_by(start_node=nodes[i], end_node=nodes[i+1]).first()
-            edge = Edge.query.filter_by(start_node=nodes[i+1], end_node=nodes[i]).first() if not edge else edge
-            edges.append(edge)
-        return nodes, edges
+        result = []
+        for path in paths:
+            nodes, distance = path
+            edges = Node.compose_edges(nodes)
 
-    def find_path(self, start, end):
-        self.path.append(start)
-        self.visited.add(start)
+            result.append((nodes, edges, distance)) # each element: tuple (nodes_list, edges_list, distance)
+        
+        return result
+
+
+    def find_paths(self, start, end, distance=0, path=[]):
+        path = path + [start]
+        if len(path) > 1:
+            distance = distance + path[-2].distance_to(start)
 
         if start == end:
-            return self.path
-        
-        for edge in start.edges(): #start.neighbours:
-            node = edge.end_node
-            node = edge.start_node if node == start else node
-            if node not in self.visited:
-                result = self.find_path(node, end)
-                if result:
-                    return result
-                
-        self.path.pop()
+            return [(path, distance)]
+
+        paths = []
+        for neighbor in start.neighbours():
+            if neighbor not in path:
+                new_paths = self.find_paths(neighbor, end, path=path, distance=distance)
+                paths.extend(new_paths)
+        return paths
