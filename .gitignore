@@ -1,6 +1,6 @@
-v3/__pycache__/
-v3/venv
-v3/static/frames/
-v3/services/__pycache__/
+__pycache__/
+venv
+static/frames/
+services/__pycache__/
 notes.txt
-v3/instance/
+instance/
