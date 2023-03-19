@@ -50,16 +50,15 @@ def build_way():
     timer = TimerService()
 
     result = wbs.build_way(start, end)
-    path = result[0] if result else ()
 
-    nodes_to_highlight, edges_to_highlight, distance = path if path else ([], [], 0)
+    nodes_to_highlight, edges_to_highlight, distance = result# if path else ([], [], '∞')
 
     mgs_instance = MapGeneratorService(edges=edges, nodes=nodes)
     frame_filepath = mgs_instance.call(edges_to_highlight=edges_to_highlight, nodes_to_highlight=nodes_to_highlight)
 
     info = {
-        'distance': f'{distance} км',
-        'path': ' -> '.join([n.title for n in nodes_to_highlight]),
+        'distance': f'{distance or "∞"} км',
+        'path': ' -> '.join([n.title for n in nodes_to_highlight]) or 'не знайдено',
         'time': str(timer)
     }
 
