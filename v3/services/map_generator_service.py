@@ -9,7 +9,6 @@ import networkx as nx
 import os
 import uuid
 from models import Edge, Node
-from services.ua_sorting_service import UASortingService
 
 matplotlib.use('Agg')
 

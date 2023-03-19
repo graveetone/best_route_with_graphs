@@ -1,4 +1,5 @@
 from models import Node, Edge
+
 class WayBuilderService:
     def __init__(self):
         self.nodes = Node.query.all()
