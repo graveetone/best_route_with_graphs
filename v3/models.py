@@ -33,7 +33,17 @@ class Node(db.Model):
             ns.add(edge.end_node)
         
         return list(ns)
-            
+
+    @staticmethod
+    def compose_edges(nodes):
+        edges = []
+        for i in range(len(nodes)-1):
+            edge = Edge.query.filter_by(start_node=nodes[i], end_node=nodes[i+1]).first()
+            edge = Edge.query.filter_by(start_node=nodes[i+1], end_node=nodes[i]).first() if not edge else edge
+            edges.append(edge)
+        
+        return edges
+
 
 class Edge(db.Model):
     __tablename__ = 'edges'
@@ -45,6 +55,10 @@ class Edge(db.Model):
     end_node = db.relationship('Node', back_populates='in_edges', foreign_keys=[end_node_id])
     is_custom = db.Column(db.Boolean, default=False)
 
+
+    @staticmethod
+    def calculate_overall_distance(edges):
+        return sum([edge.weight for edge in edges])
 
     def __repr__(self):
         return f"<Edge {self.start_node.title}-{self.end_node.title} with weight {self.weight}>"
