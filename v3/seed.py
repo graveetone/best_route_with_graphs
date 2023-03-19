@@ -40,7 +40,7 @@ with app.app_context():
                 weight=weight
             )
 
-        edges_to_save.append(edge)
+            edges_to_save.append(edge)
 
     db.session.add_all(edges_to_save)
     db.session.commit()
