@@ -5,67 +5,86 @@
 {%- endblock title %}
 
 {% block styles %}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css">
-    <style>
-        form {
-            display: block;
-        }
-    </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css">
+<style>
+    form {
+        display: block;
+    }
+</style>
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}
-    <script>
-        function replaceMap(src) {
-            const map = document.querySelector('#map');
-            map.src = src;
-        }
+{{ super() }}
+<script>
+    function replaceMap(src) {
+        const map = document.querySelector('#map');
+        map.src = src;
+    }
 
-        function buildWay() {
-            replaceMap("{{ url_for('static', filename='loading.gif')}}")
-            let start = document.querySelector('#start').value;
-            let end = document.querySelector('#end').value;
-            fetch(`{{url_for('build_way')}}?start=${start}&end=${end}`)
+    function buildWay() {
+        replaceMap("{{ url_for('static', filename='loading.gif')}}")
+        let start = document.querySelector('#start').value;
+        let end = document.querySelector('#end').value;
+        fetch(`{{url_for('build_way')}}?start=${start}&end=${end}`)
             .then(response => response.json())
             .then(data => {
-                console.log(data.map)
+                ['distance', 'time', 'path'].forEach (param => {
+                    document.querySelector(`#${param}`).innerHTML = data[param];
+                })
                 replaceMap(data.map)
             })
             .catch(error => console.error(error));
-        }
-    </script>
+    }
+</script>
 {% endblock %}
 
 {% block content %}
-    <div class="d-flex flex-column align-items-center justify-content-around">
+<div id='main_container' class="d-flex flex-row align-items-center justify-content-around">
+    <div class="d-flex flex-column align-items-center justify-content-center">
         <img class='w-50 h-75' id='map' src="{{ map_src }}" alt="">
-        
-        <div class="d-flex flex-row justify-content-between m-4">
-            <div class="d-flex flex-column align-items-center m-4">
-                <label for="start">Початкова точка:</label>
-                <select id='start' class="form-select" aria-label="Початкова точка">
-                    {% for node in nodes %}
-                        <option value={{ node.id }}>{{ node.title }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <div id='menu' class="d-flex flex-column justify-content-around m-2">
+            <div id='selects+table' class="d-flex flex-column justify-content-around">
+                <div id='selects' class="d-flex flex-row">
+                    <div id='select1' class="d-flex flex-column align-items-center mx-5">
+                        <label for="start">Початкова точка:</label>
+                        <select id='start' class="form-select border border-dark" aria-label="Початкова точка">
+                            {% for node in nodes %}
+                            <option value={{ node.id }}>{{ node.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-            <div class="flex-column align-items-center m-4">
-                <label for="end">Кінцева точка:</label>
-                <select id='end' class="form-select" aria-label="Початкова точка">
-                    {% for node in nodes %}
-                        <option value={{ node.id }}>{{ node.title }}</option>
-                    {% endfor %}
-                </select>
+                    <div id='select2' class="d-flex flex-column align-items-center mx-5">
+                        <label for="end">Кінцева точка:</label>
+                        <select id='end' class="form-select border border-dark" aria-label="Початкова точка">
+                            {% for node in nodes %}
+                            <option value={{ node.id }}>{{ node.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <table class="table d-flex justify-content-center mt-4">
+                    <tr class="bg-primary">
+                        <td>Оптимальний шлях:</td>
+                        <td id="path"></td>
+                    </tr>
+                    <tr class="bg-success">
+                        <td>Загальна відстань:</td>
+                        <td id="distance"></td>
+                    </tr>
+                    <tr class="bg-danger">
+                        <td>Час пошуку:</td>
+                        <td id="time"></td>
+                    </tr>
+                </table>
+                </div>
+            </div>
+            <div id='buttons' class="d-flex flex-row justify-content-around align-items-around">
+                <a href="{{ url_for('home', reset=True) }}" id="homeButton" class="btn btn-warning m-2">Спочатку</a>
+                <a href="{{ url_for('add_edge') }}" id="addEdgeButton" class="btn btn-danger m-2">Додати ребро</a>
+                <button onclick="buildWay()" id="buildWayButton" class="btn btn-primary m-2">Побудувати шлях</button>
+                <a href="{{ url_for('add_node') }}" id="addNodeButton" class="btn btn-success m-2">Додати вершину</a>
             </div>
         </div>
-            
-
-        <div class="d-flex justify-content-between">
-            <a href="{{ url_for('home') }}" id="homeButton" class="btn btn-warning mx-2">Спочатку</a>
-            <a href="{{ url_for('add_edge') }}" id="addEdgeButton" class="btn btn-danger mx-2">Додати ребро</a>
-            <button onclick="buildWay()" id="buildWayButton" class="btn btn-primary">Побудувати шлях</button>
-            <a href="{{ url_for('add_node') }}" id="addNodeButton" class="btn btn-success mx-2">Додати вершину</a>
-        </div>
-    </div>
+</div>
 {% endblock %}
