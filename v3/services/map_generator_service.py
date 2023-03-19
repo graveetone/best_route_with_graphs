@@ -8,7 +8,7 @@ import networkx as nx
 
 import os
 import uuid
-
+from models import Edge, Node
 from services.ua_sorting_service import UASortingService
 
 matplotlib.use('Agg')
@@ -16,7 +16,7 @@ matplotlib.use('Agg')
 class MapGeneratorService:
     def __init__(self, nodes, edges):
         self.nodes = nodes
-        self.edges = UASortingService(edges).call(comparator=lambda edge: edge.start_node.title)
+        self.edges = edges
 
         self.basic_map_image = mpimg.imread('static/map.png')
 
@@ -42,8 +42,10 @@ class MapGeneratorService:
         self.edge_widths = []
         self.edge_colors = []
 
-        for edge in self.edges:
-            edge_is_chosen = edge in self.edges_to_highlight
+        for edge in self.graph.edges():
+            sn = Node.find_by_title(edge[0])
+            en = Node.find_by_title(edge[1])
+            edge_is_chosen = Edge.query.filter_by(start_node=sn, end_node=en).first() in self.edges_to_highlight
             
             self.edge_colors.append('red' if edge_is_chosen else 'black')
             self.edge_widths.append(2 if edge_is_chosen else 0.5)
@@ -63,13 +65,14 @@ class MapGeneratorService:
         node_label_positions = {node.title : [node.x, node.y - 15] for node in self.nodes}
         
 
-        self.compose_node_colors()
-        self.compose_edge_colors()
 
         self.graph = nx.DiGraph()
         self.graph.add_nodes_from(titles)
         self.graph.add_weighted_edges_from([(edge.start_node.title, edge.end_node.title, edge.weight) for edge in self.edges])
         
+        self.compose_node_colors()
+        self.compose_edge_colors()
+
         nx.draw_networkx_nodes(self.graph, positions, node_color=self.node_colors, node_size=50, edgecolors='black')
         nx.draw_networkx_edges(self.graph, positions, width=self.edge_widths, edge_color=self.edge_colors, arrows=False)
 
